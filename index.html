@@ -1420,6 +1420,16 @@ body { font-size: 1.2rem; font-weight: 500; }
 .pn-login label { font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); text-align: center; }
 .pn-login input { font: 500 1.1rem "Cormorant Garamond", serif; padding: 0.7rem; border: 1px solid var(--gold-pale); border-radius: 3px; background: #fffdfa; color: var(--ink); text-align: center; }
 .pn-login button { font-family: var(--serif-display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.8rem; cursor: pointer; }
+.pn-add { background: #fffdfa; border: 1px solid var(--gold-pale); border-radius: 4px; padding: 0.9rem; display: grid; gap: 0.5rem; }
+.pn-add-title { font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
+.pn-add-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.5rem; }
+@media (max-width: 520px) { .pn-add-row { grid-template-columns: 1fr 1fr; } .pn-add-row input { grid-column: 1 / -1; } }
+.pn-add-row input, .pn-add-row select { font: 500 1.05rem "Cormorant Garamond", serif; padding: 0.6rem 0.7rem; border: 1px solid var(--gold-pale); border-radius: 3px; background: #fff; color: var(--ink); min-width: 0; }
+.pn-add-row button { font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.6rem 1rem; cursor: pointer; }
+.pn-add-row button:disabled { opacity: 0.6; }
+.pn-add-msg { font-size: 0.95rem; color: var(--ink); overflow-wrap: anywhere; }
+.pn-add-msg:empty { display: none; }
+.pn-add-link { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; color: var(--wine); }
 .pn-close { justify-self: center; margin-top: 1rem; font-family: var(--serif-display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.9rem 1.6rem; cursor: pointer; }
 </style>
 </head>
@@ -2356,6 +2366,18 @@ document.addEventListener("DOMContentLoaded", function () {
             <div class="pn-tile all"><b id="pn-all">–</b><span id="pn-all-s">Personas invitadas</span></div>
           </div>
           <p class="pn-note" id="pn-note"></p>
+          <form class="pn-add" id="pn-add">
+            <p class="pn-add-title">Agregar invitado</p>
+            <div class="pn-add-row">
+              <input type="text" id="pn-add-name" placeholder="Nombre del invitado" aria-label="Nombre del invitado" required />
+              <select id="pn-add-n" aria-label="Personas">
+                <option value="1">1 persona</option><option value="2">2 personas</option><option value="3">3 personas</option>
+                <option value="4">4 personas</option><option value="5">5 personas</option>
+              </select>
+              <button type="submit" id="pn-add-btn">Agregar</button>
+            </div>
+            <p class="pn-add-msg" id="pn-add-msg" role="status"></p>
+          </form>
           <div class="pn-filter" role="group" aria-label="Filtrar">
             <button type="button" data-f="todos" aria-pressed="true">Todos</button>
             <button type="button" data-f="si" aria-pressed="false">Asistirán</button>
@@ -2416,6 +2438,28 @@ document.addEventListener("DOMContentLoaded", function () {
         return false;
       }
     }
+    $("pn-add").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const nombre = $("pn-add-name").value.trim();
+      const personas = parseInt($("pn-add-n").value, 10) || 1;
+      const msg = $("pn-add-msg");
+      if (!nombre) { msg.textContent = "Escribe el nombre del invitado."; return; }
+      const btn = $("pn-add-btn"); btn.disabled = true; btn.textContent = "Agregando…";
+      try {
+        const g = await rpc("agregar_invitado", { p_clave: clave, p_nombre: nombre, p_personas: personas });
+        const link = `${baseLink}?i=${g.codigo}`;
+        msg.innerHTML = `<b></b> agregado. Su enlace: <span class="pn-add-link"></span> <button type="button" class="pn-copy">Copiar enlace</button>`;
+        msg.querySelector("b").textContent = g.nombre;
+        msg.querySelector(".pn-add-link").textContent = link;
+        msg.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(link, ev.currentTarget));
+        $("pn-add-name").value = ""; $("pn-add-n").value = "1";
+        await carga();
+      } catch {
+        msg.textContent = "No se pudo agregar. Revisa tu conexión e inténtalo de nuevo.";
+      } finally {
+        btn.disabled = false; btn.textContent = "Agregar";
+      }
+    });
     $("pn-login").addEventListener("submit", async (e) => {
       e.preventDefault(); clave = $("pn-pass").value.trim();
       if (await carga()) setInterval(carga, 60000);
