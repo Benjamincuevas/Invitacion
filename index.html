@@ -1421,7 +1421,21 @@ body { font-size: 1.2rem; font-weight: 500; }
 .pn-row.no .pn-state { background: #f6e1e4; color: var(--wine); }
 .pn-row.pend .pn-state { background: #fbefd9; color: #9a6b1f; }
 .pn-copy { background: none; border: 0; color: var(--wine); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
-@media (max-width: 560px) { .pn-row { grid-template-columns: 1.6rem minmax(0, 1fr); } .pn-state, .pn-copy { grid-column: 2; justify-self: start; } }
+.pn-acts { display: flex; gap: 0.9rem; align-items: center; }
+.pn-del { background: none; border: 0; color: var(--ink-soft); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
+.pn-del:hover { color: var(--wine); }
+.pn-confirm { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; background: #f6e1e4; border-radius: 4px; padding: 0.6rem 0.8rem; font-size: 0.95rem; }
+.pn-confirm[hidden] { display: none; }
+.pn-confirm span { flex: 1 1 14rem; }
+.pn-yes { font-family: var(--serif-display); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.5rem 0.9rem; cursor: pointer; }
+.pn-yes:disabled { opacity: 0.6; }
+.pn-cancel { background: none; border: 0; color: var(--ink); font-size: 0.9rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pn-search { display: flex; gap: 0.6rem; align-items: center; }
+.pn-search input { flex: 1; min-width: 0; font: 500 1.1rem "Cormorant Garamond", serif; padding: 0.65rem 0.9rem; border: 1px solid var(--gold-pale); border-radius: 999px; background: #fffdfa; color: var(--ink); }
+.pn-search input:focus { outline: 2px solid var(--blush); outline-offset: 1px; }
+.pn-count { font-size: 0.85rem; color: var(--ink-soft); white-space: nowrap; }
+.pn-empty { text-align: center; font-style: italic; color: var(--ink-soft); padding: 1.2rem 0; }
+@media (max-width: 560px) { .pn-row { grid-template-columns: 1.6rem minmax(0, 1fr); } .pn-state, .pn-acts { grid-column: 2; justify-self: start; } }
 .pn-sub { font-family: var(--serif-display); font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-top: 1rem; }
 .pn-other { font-size: 1rem; padding: 0.3rem 0; }
 .pn-login { display: grid; gap: 0.6rem; max-width: 300px; margin: 0 auto; }
@@ -2386,6 +2400,10 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
             <p class="pn-add-msg" id="pn-add-msg" role="status"></p>
           </form>
+          <div class="pn-search">
+            <input type="search" id="pn-q" placeholder="Buscar invitado…" aria-label="Buscar invitado" autocomplete="off" />
+            <span class="pn-count" id="pn-count" role="status"></span>
+          </div>
           <div class="pn-filter" role="group" aria-label="Filtrar">
             <button type="button" data-f="todos" aria-pressed="true">Todos</button>
             <button type="button" data-f="si" aria-pressed="false">Asistirán</button>
@@ -2398,7 +2416,8 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>`;
     document.body.appendChild(panel);
     $("envelope-screen") && ($("envelope-screen").style.display = "none");
-    let filas = [], filtro = "todos", clave = "";
+    let filas = [], filtro = "todos", clave = "", q = "";
+    const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
     try { clave = sessionStorage.getItem("panelClave") || ""; } catch {}
     const baseLink = location.origin + location.pathname;
     const copiar = async (txt, b) => {
@@ -2420,18 +2439,39 @@ document.addEventListener("DOMContentLoaded", function () {
       $("pn-ok").textContent = si; $("pn-no").textContent = no; $("pn-wait").textContent = pend;
       $("pn-all").textContent = tot; $("pn-all-s").textContent = `Personas invitadas · ${filas.length} invitaciones`;
       const ul = $("pn-list"); ul.innerHTML = "";
+      const nq = norm(q); let shown = 0;
       filas.forEach((f, idx) => {
         const estado = f.asiste === true ? "si" : f.asiste === false ? "no" : "pend";
         if (filtro !== "todos" && filtro !== estado) return;
+        if (nq && !norm(f.nombre).includes(nq)) return;
+        shown++;
         const p = f.personas || 1;
         const etiqueta = estado === "si" ? `Asistirá${p > 1 ? ` · ${f.confirmadas} de ${p}` : ""}` : estado === "no" ? "No asistirá" : "Sin responder";
         const li = document.createElement("li");
         li.className = "pn-row " + estado;
-        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}</div><span class="pn-state">${etiqueta}</span><button type="button" class="pn-copy">Copiar enlace</button>`;
-        li.querySelector("b").textContent = f.nombre;
+        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
+        li.querySelector(".pn-who b").textContent = f.nombre;
+        li.querySelector(".pn-confirm b").textContent = f.nombre;
         li.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(`${baseLink}?i=${f.codigo}`, ev.currentTarget));
+        const conf = li.querySelector(".pn-confirm");
+        li.querySelector(".pn-del").addEventListener("click", () => { conf.hidden = false; li.querySelector(".pn-cancel").focus(); });
+        li.querySelector(".pn-cancel").addEventListener("click", () => { conf.hidden = true; });
+        li.querySelector(".pn-yes").addEventListener("click", async (ev) => {
+          const b = ev.currentTarget; b.disabled = true; b.textContent = "Quitando…";
+          try {
+            await rpc("quitar_invitado", { p_clave: clave, p_codigo: f.codigo });
+            filas = filas.filter((x) => x.codigo !== f.codigo);
+            $("pn-add-msg").textContent = `${f.nombre} fue quitado de la lista.`;
+            pinta();
+          } catch {
+            b.disabled = false; b.textContent = "Sí, quitar";
+            conf.querySelector("span").textContent = "No se pudo quitar. Revisa tu conexión e inténtalo de nuevo.";
+          }
+        });
         ul.appendChild(li);
       });
+      $("pn-count").textContent = nq || filtro !== "todos" ? `${shown} de ${filas.length}` : "";
+      if (!shown) { const li = document.createElement("li"); li.className = "pn-empty"; li.textContent = "No hay invitados que coincidan."; ul.appendChild(li); }
     }
     async function carga() {
       try {
@@ -2472,6 +2512,7 @@ document.addEventListener("DOMContentLoaded", function () {
       e.preventDefault(); clave = $("pn-pass").value.trim();
       if (await carga()) setInterval(carga, 60000);
     });
+    $("pn-q").addEventListener("input", (e) => { q = e.target.value; pinta(); });
     panel.querySelector(".pn-filter").addEventListener("click", (e) => {
       const b = e.target.closest("button"); if (!b) return;
       filtro = b.dataset.f;
