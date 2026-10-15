@@ -1674,7 +1674,7 @@ html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-
 
 <script>
 /* Mientras se carga la invitación personal, el texto del sobre espera (evita ver el idioma equivocado) */
-if (/[?&]i=/.test(location.search) && !/[?&]lang=/.test(location.search)) {
+if (/[?&]i=/.test(location.search) && !/[?&]lang=/.test(location.search) && !/^\/en(\/|\.html)?$/.test(location.pathname)) {
   document.documentElement.classList.add("i18n-wait");
   setTimeout(() => document.documentElement.classList.remove("i18n-wait"), 2500);
 }
@@ -1890,7 +1890,9 @@ document.addEventListener("DOMContentLoaded", function () {
       titulo: (a, b) => `${a} & ${b}'s Wedding`,
     },
   };
-  let lang = /^en/i.test(params.get("lang") || "") ? "en" : "es";
+  const enRuta = /^\/en(\/|\.html)?$/.test(location.pathname);
+  const forzado = enRuta || params.get("lang");
+  let lang = enRuta || /^en/i.test(params.get("lang") || "") ? "en" : "es";
   let T = I18N[lang];
 
   /* --- Sobre --- */
@@ -2443,7 +2445,7 @@ document.addEventListener("DOMContentLoaded", function () {
     textoPases = textoDePases(pases);
     cuantos = maxPersonas;
     $("guest-line").textContent = guest;
-    aplicaIdioma(params.get("lang") ? lang : (g.idioma || lang));
+    aplicaIdioma(forzado ? lang : (g.idioma || lang));
     pintaContador();
     $("rf-nolink").hidden = true;
     if (g.asiste === true || g.asiste === false) mostrarHecho(g.asiste, g.confirmadas || 0);
@@ -2533,7 +2535,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try { lista = sessionStorage.getItem("panelLista") === "en" ? "en" : "es"; } catch {}
     const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
     try { clave = sessionStorage.getItem("panelClave") || ""; } catch {}
-    const baseLink = location.origin + location.pathname;
+    const baseLink = location.origin + "/";
+    const enlaceDe = (codigo, idioma) => `${location.origin}/${idioma === "en" ? "en" : ""}?i=${codigo}`;
     const copiar = async (txt, b) => {
       let ok = false;
       try { await navigator.clipboard.writeText(txt); ok = true; } catch {
@@ -2570,7 +2573,7 @@ document.addEventListener("DOMContentLoaded", function () {
         li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
         li.querySelector(".pn-who b").textContent = f.nombre;
         li.querySelector(".pn-confirm b").textContent = f.nombre;
-        li.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(`${baseLink}?i=${f.codigo}`, ev.currentTarget));
+        li.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(enlaceDe(f.codigo, f.idioma), ev.currentTarget));
         const conf = li.querySelector(".pn-confirm");
         li.querySelector(".pn-del:not(.pn-idioma)").addEventListener("click", () => { conf.hidden = false; li.querySelector(".pn-cancel").focus(); });
         li.querySelector(".pn-idioma").addEventListener("click", async (ev) => {
@@ -2620,7 +2623,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const btn = $("pn-add-btn"); btn.disabled = true; btn.textContent = "Agregando…";
       try {
         const g = await rpc("agregar_invitado", { p_clave: clave, p_nombre: nombre, p_personas: personas, p_idioma: $("pn-add-lang").value });
-        const link = `${baseLink}?i=${g.codigo}`;
+        const link = enlaceDe(g.codigo, g.idioma);
         msg.innerHTML = `<b></b> agregado. Su enlace: <span class="pn-add-link"></span> <button type="button" class="pn-copy">Copiar enlace</button>`;
         msg.querySelector("b").textContent = g.nombre;
         msg.querySelector(".pn-add-link").textContent = link;
