@@ -1458,6 +1458,9 @@ html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-
 .gl-line { font-size: 0.95rem; color: var(--ink-soft); margin: 0.1rem 0; }
 .gl-line b { color: var(--ink); font-weight: 600; }
 .pn-lang { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; color: #2d4f86; background: #e4ebf7; border-radius: 999px; padding: 0.05rem 0.5rem; }
+.pn-lists { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--wine); border-radius: 4px; overflow: hidden; }
+.pn-lists button { font-family: var(--serif-display); font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.75rem 0.5rem; border: 0; background: #fffdfa; color: var(--wine); cursor: pointer; line-height: 1.4; }
+.pn-lists button[aria-selected="true"] { background: var(--wine); color: #fdf3ec; }
 .pn-close { justify-self: center; margin-top: 1rem; font-family: var(--serif-display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.9rem 1.6rem; cursor: pointer; }
 </style>
 </head>
@@ -2485,6 +2488,10 @@ document.addEventListener("DOMContentLoaded", function () {
           <p class="pn-note" id="pn-login-msg"></p>
         </form>
         <div id="pn-body" hidden>
+          <div class="pn-lists" role="tablist" aria-label="Lista de invitados">
+            <button type="button" role="tab" data-l="es" aria-selected="true">Invitados en español <span id="pn-n-es"></span></button>
+            <button type="button" role="tab" data-l="en" aria-selected="false">Invitados en inglés <span id="pn-n-en"></span></button>
+          </div>
           <div class="pn-tiles">
             <div class="pn-tile ok"><b id="pn-ok">–</b><span>Personas que asistirán</span></div>
             <div class="pn-tile no"><b id="pn-no">–</b><span>Personas que no asistirán</span></div>
@@ -2523,7 +2530,8 @@ document.addEventListener("DOMContentLoaded", function () {
       </div>`;
     document.body.appendChild(panel);
     $("envelope-screen") && ($("envelope-screen").style.display = "none");
-    let filas = [], filtro = "todos", clave = "", q = "";
+    let filas = [], filtro = "todos", clave = "", q = "", lista = "es";
+    try { lista = sessionStorage.getItem("panelLista") === "en" ? "en" : "es"; } catch {}
     const norm = (s) => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
     try { clave = sessionStorage.getItem("panelClave") || ""; } catch {}
     const baseLink = location.origin + location.pathname;
@@ -2537,17 +2545,21 @@ document.addEventListener("DOMContentLoaded", function () {
     };
     function pinta() {
       let si = 0, no = 0, pend = 0, tot = 0;
-      for (const f of filas) {
+      const deLista = filas.filter((f) => (f.idioma === "en" ? "en" : "es") === lista);
+      $("pn-n-es").textContent = `(${filas.length - filas.filter((f) => f.idioma === "en").length})`;
+      $("pn-n-en").textContent = `(${filas.filter((f) => f.idioma === "en").length})`;
+      panel.querySelectorAll(".pn-lists button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.l === lista)));
+      for (const f of deLista) {
         const p = f.personas || 1; tot += p;
         if (f.asiste === true) { const c = Math.min(p, f.confirmadas || 1); si += c; no += p - c; }
         else if (f.asiste === false) no += p;
         else pend += p;
       }
       $("pn-ok").textContent = si; $("pn-no").textContent = no; $("pn-wait").textContent = pend;
-      $("pn-all").textContent = tot; $("pn-all-s").textContent = `Personas invitadas · ${filas.length} invitaciones`;
+      $("pn-all").textContent = tot; $("pn-all-s").textContent = `Personas invitadas · ${deLista.length} invitaciones`;
       const ul = $("pn-list"); ul.innerHTML = "";
       const nq = norm(q); let shown = 0;
-      filas.forEach((f, idx) => {
+      deLista.forEach((f, idx) => {
         const estado = f.asiste === true ? "si" : f.asiste === false ? "no" : "pend";
         if (filtro !== "todos" && filtro !== estado) return;
         if (nq && !norm(f.nombre).includes(nq)) return;
@@ -2583,12 +2595,13 @@ document.addEventListener("DOMContentLoaded", function () {
         });
         ul.appendChild(li);
       });
-      $("pn-count").textContent = nq || filtro !== "todos" ? `${shown} de ${filas.length}` : "";
+      $("pn-count").textContent = nq || filtro !== "todos" ? `${shown} de ${deLista.length}` : "";
       if (!shown) { const li = document.createElement("li"); li.className = "pn-empty"; li.textContent = "No hay invitados que coincidan."; ul.appendChild(li); }
     }
     async function carga() {
       try {
         filas = (await rpc("panel_confirmaciones", { p_clave: clave })) || [];
+        if ($("pn-body").hidden) $("pn-add-lang").value = lista;
         $("pn-login").hidden = true; $("pn-body").hidden = false;
         try { sessionStorage.setItem("panelClave", clave); } catch {}
         $("pn-note").textContent = `Última actualización: ${new Date().toLocaleTimeString("es-DO", { hour: "numeric", minute: "2-digit" })} · se actualiza sola cada minuto`;
@@ -2613,7 +2626,8 @@ document.addEventListener("DOMContentLoaded", function () {
         msg.querySelector("b").textContent = g.nombre;
         msg.querySelector(".pn-add-link").textContent = link;
         msg.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(link, ev.currentTarget));
-        $("pn-add-name").value = ""; $("pn-add-n").value = "1"; $("pn-add-lang").value = "es";
+        lista = g.idioma === "en" ? "en" : "es";
+        $("pn-add-name").value = ""; $("pn-add-n").value = "1"; $("pn-add-lang").value = lista;
         await carga();
       } catch {
         msg.textContent = "No se pudo agregar. Revisa tu conexión e inténtalo de nuevo.";
@@ -2624,6 +2638,12 @@ document.addEventListener("DOMContentLoaded", function () {
     $("pn-login").addEventListener("submit", async (e) => {
       e.preventDefault(); clave = $("pn-pass").value.trim();
       if (await carga()) setInterval(carga, 60000);
+    });
+    panel.querySelector(".pn-lists").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      lista = b.dataset.l; $("pn-add-lang").value = lista;
+      try { sessionStorage.setItem("panelLista", lista); } catch {}
+      pinta();
     });
     $("pn-q").addEventListener("input", (e) => { q = e.target.value; pinta(); });
     panel.querySelector(".pn-filter").addEventListener("click", (e) => {
