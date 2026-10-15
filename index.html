@@ -1454,6 +1454,7 @@ body { font-size: 1.2rem; font-weight: 500; }
 .pn-add-link { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; color: var(--wine); }
 html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-cta, html.i18n-wait #envelope-screen .env-card { visibility: hidden; }
 .env-hint, .env-cta, .env-card { transition: opacity .4s; }
+.gl-number.gl-email { font-size: clamp(1rem, 4.6vw, 1.35rem); letter-spacing: 0.02em; overflow-wrap: anywhere; }
 .gl-line { font-size: 0.95rem; color: var(--ink-soft); margin: 0.1rem 0; }
 .gl-line b { color: var(--ink); font-weight: 600; }
 .pn-lang { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; color: #2d4f86; background: #e4ebf7; border-radius: 999px; padding: 0.05rem 0.5rem; }
@@ -1761,7 +1762,12 @@ const CONFIG = {
         { banco: "Banco Popular", numero: "821540374" },
       ],
       // Cuenta que ven los invitados de la versión en inglés
-      cuentasEn: [],
+      cuentasEn: [
+        { banco: "Zelle", numero: "Benjamincuevas990@gmail.com", correo: true,
+          lineas: [["Name:", "Benjamin Alfredo Cuevas Marte"]] },
+        { banco: "Lead Bank · Checking", numero: "217297183200",
+          lineas: [["Routing:", "101019644"], ["Name:", "Benjamin Alfredo Cuevas Marte"]] },
+      ],
     },
 
     // Nota juguetona al final de la mesa de regalos
@@ -1836,7 +1842,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ceremoniaYRecepcion: "Ceremonia y recepción", verUbicacion: "Ver ubicación", vestimenta: "Código de vestimenta",
       conCarino: "Con cariño", regalos: "Regalos", queridos: "Queridos familiares y amigos,", conAmor: "Con amor,",
       giftMsg: "Su presencia es nuestro mejor regalo; sin embargo, si desean tener un detalle con nosotros, pueden hacerlo aquí:",
-      copiarNumero: "Copiar número", copiado: "Copiado ✓",
+      copiarNumero: "Copiar número", copiarCorreo: "Copiar correo", copiado: "Copiado ✓",
       confirma: "Confirma tu asistencia", si: "Sí, asistiré", no: "No podré asistir", cuantas: "¿Cuántas personas asistirán?",
       enviar: "Enviar respuesta", enviando: "Enviando…", nolink: "Para confirmar, abre el enlace personal que te enviamos.",
       cambiar: "Cambiar mi respuesta", esperamos: "¡Te esperamos!",
@@ -1862,7 +1868,7 @@ document.addEventListener("DOMContentLoaded", function () {
       ceremoniaYRecepcion: "Ceremony & reception", verUbicacion: "View location", vestimenta: "Dress code",
       conCarino: "With love", regalos: "Gifts", queridos: "Dear family and friends,", conAmor: "With love,",
       giftMsg: "Your presence is our greatest gift; however, if you would like to give us something, you can do so here:",
-      copiarNumero: "Copy number", copiado: "Copied ✓",
+      copiarNumero: "Copy account number", copiarCorreo: "Copy email", copiado: "Copied ✓",
       confirma: "Kindly RSVP", si: "Joyfully accept", no: "Regretfully decline", cuantas: "How many guests will attend?",
       enviar: "Send response", enviando: "Sending…", nolink: "To RSVP, please open the personal link we sent you.",
       cambiar: "Change my response", esperamos: "We can't wait to see you!",
@@ -2313,6 +2319,7 @@ document.addEventListener("DOMContentLoaded", function () {
         row.innerHTML = `<p class="gl-bank"></p><p class="gl-number"></p><button type="button" class="gl-copy"></button>`;
         row.querySelector(".gl-bank").textContent = c.banco;
         row.querySelector(".gl-number").textContent = c.numero;
+        if (c.correo) row.querySelector(".gl-number").classList.add("gl-email");
         (c.lineas || []).forEach(([k, v]) => {
           const p = document.createElement("p"); p.className = "gl-line";
           p.innerHTML = "<span></span> <b></b>";
@@ -2320,7 +2327,8 @@ document.addEventListener("DOMContentLoaded", function () {
           row.insertBefore(p, row.querySelector(".gl-copy"));
         });
         const b = row.querySelector(".gl-copy");
-        b.textContent = T.copiarNumero;
+        const etiqueta = c.correo ? T.copiarCorreo : T.copiarNumero;
+        b.textContent = etiqueta;
         b.addEventListener("click", async () => {
           let ok = false;
           try { await navigator.clipboard.writeText(c.numero); ok = true; } catch {}
@@ -2329,7 +2337,7 @@ document.addEventListener("DOMContentLoaded", function () {
             try { ok = document.execCommand("copy"); } catch {} t.remove();
           }
           b.textContent = ok ? T.copiado : c.numero;
-          setTimeout(() => (b.textContent = T.copiarNumero), 2200);
+          setTimeout(() => (b.textContent = etiqueta), 2200);
         });
         box.appendChild(row);
       });
