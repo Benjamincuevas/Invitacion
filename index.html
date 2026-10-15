@@ -1421,7 +1421,7 @@ body { font-size: 1.2rem; font-weight: 500; }
 .pn-row.no .pn-state { background: #f6e1e4; color: var(--wine); }
 .pn-row.pend .pn-state { background: #fbefd9; color: #9a6b1f; }
 .pn-copy { background: none; border: 0; color: var(--wine); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
-.pn-acts { display: flex; gap: 0.9rem; align-items: center; }
+.pn-acts { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; align-items: center; }
 .pn-del { background: none; border: 0; color: var(--ink-soft); font-size: 0.85rem; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; white-space: nowrap; }
 .pn-del:hover { color: var(--wine); }
 .pn-confirm { grid-column: 2 / -1; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem; align-items: center; background: #f6e1e4; border-radius: 4px; padding: 0.6rem 0.8rem; font-size: 0.95rem; }
@@ -1444,14 +1444,19 @@ body { font-size: 1.2rem; font-weight: 500; }
 .pn-login button { font-family: var(--serif-display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.8rem; cursor: pointer; }
 .pn-add { background: #fffdfa; border: 1px solid var(--gold-pale); border-radius: 4px; padding: 0.9rem; display: grid; gap: 0.5rem; }
 .pn-add-title { font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); }
-.pn-add-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 0.5rem; }
-@media (max-width: 520px) { .pn-add-row { grid-template-columns: 1fr 1fr; } .pn-add-row input { grid-column: 1 / -1; } }
+.pn-add-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto auto; gap: 0.5rem; }
+@media (max-width: 620px) { .pn-add-row { grid-template-columns: 1fr 1fr; } .pn-add-row input, .pn-add-row button { grid-column: 1 / -1; } }
 .pn-add-row input, .pn-add-row select { font: 500 1.05rem "Cormorant Garamond", serif; padding: 0.6rem 0.7rem; border: 1px solid var(--gold-pale); border-radius: 3px; background: #fff; color: var(--ink); min-width: 0; }
 .pn-add-row button { font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.6rem 1rem; cursor: pointer; }
 .pn-add-row button:disabled { opacity: 0.6; }
 .pn-add-msg { font-size: 0.95rem; color: var(--ink); overflow-wrap: anywhere; }
 .pn-add-msg:empty { display: none; }
 .pn-add-link { font-family: ui-monospace, Menlo, monospace; font-size: 0.85rem; color: var(--wine); }
+html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-cta, html.i18n-wait #envelope-screen .env-card { visibility: hidden; }
+.env-hint, .env-cta, .env-card { transition: opacity .4s; }
+.gl-line { font-size: 0.95rem; color: var(--ink-soft); margin: 0.1rem 0; }
+.gl-line b { color: var(--ink); font-weight: 600; }
+.pn-lang { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; color: #2d4f86; background: #e4ebf7; border-radius: 999px; padding: 0.05rem 0.5rem; }
 .pn-close { justify-self: center; margin-top: 1rem; font-family: var(--serif-display); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.9rem 1.6rem; cursor: pointer; }
 </style>
 </head>
@@ -1461,12 +1466,12 @@ body { font-size: 1.2rem; font-weight: 500; }
   <div id="envelope-screen" aria-label="Invitación cerrada">
     <div class="flor tl" style="--fw:clamp(150px,46vw,260px);--fo:-18px"></div>
     <div class="flor br" style="--fw:clamp(150px,46vw,260px);--fo:-18px"></div>
-    <p class="env-hint">Tienes una invitación</p>
+    <p class="env-hint" data-i18n="envHint">Tienes una invitación</p>
     <div class="env-shadow" aria-hidden="true"></div>
     <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Abrir invitación">
       <div class="env-back"></div>
       <div class="env-card">
-        <p class="env-card-sub">Nos casamos</p>
+        <p class="env-card-sub" data-i18n="envSub">Nos casamos</p>
         <p class="env-card-names" id="env-names"></p>
         <p class="env-card-date" id="env-date"></p>
       </div>
@@ -1504,7 +1509,7 @@ body { font-size: 1.2rem; font-weight: 500; }
       <div class="env-seal" id="seal"><svg class="seal-svg" viewBox="0 0 80 80" aria-hidden="true"><defs><radialGradient id="sw" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#c2304f"/><stop offset=".55" stop-color="#83072d"/><stop offset="1" stop-color="#4a0418"/></radialGradient><radialGradient id="sh" cx="35%" cy="28%" r="45%"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs><path d="M77.2,40.0 73.9,44.9 74.1,50.0 71.4,54.3 68.7,58.4 66.9,63.3 64.8,68.6 61.5,73.4 55.4,73.8 49.8,73.4 45.1,75.8 40.0,75.0 35.1,74.2 30.3,72.9 24.6,73.8 19.5,71.9 15.5,68.3 11.8,64.5 8.6,60.2 8.5,54.4 6.3,49.9 1.4,45.5 3.0,40.0 2.8,34.7 3.9,29.4 8.9,25.8 9.3,20.3 12.2,15.9 14.8,11.0 21.3,10.9 25.1,7.4 30.4,7.2 34.6,2.5 40.0,2.4 45.2,4.2 50.6,4.0 55.7,5.6 59.6,9.4 64.7,11.5 68.4,15.4 70.3,20.5 72.4,25.2 77.3,29.1 75.3,34.9Z" fill="url(#sw)"/><circle cx="40" cy="40" r="25" fill="none" stroke="#4a0418" stroke-opacity=".55" stroke-width="2.2"/><circle cx="40" cy="40" r="23" fill="none" stroke="#e8a9a0" stroke-opacity=".35" stroke-width=".8"/><path d="M77.2,40.0 73.9,44.9 74.1,50.0 71.4,54.3 68.7,58.4 66.9,63.3 64.8,68.6 61.5,73.4 55.4,73.8 49.8,73.4 45.1,75.8 40.0,75.0 35.1,74.2 30.3,72.9 24.6,73.8 19.5,71.9 15.5,68.3 11.8,64.5 8.6,60.2 8.5,54.4 6.3,49.9 1.4,45.5 3.0,40.0 2.8,34.7 3.9,29.4 8.9,25.8 9.3,20.3 12.2,15.9 14.8,11.0 21.3,10.9 25.1,7.4 30.4,7.2 34.6,2.5 40.0,2.4 45.2,4.2 50.6,4.0 55.7,5.6 59.6,9.4 64.7,11.5 68.4,15.4 70.3,20.5 72.4,25.2 77.3,29.1 75.3,34.9Z" fill="url(#sh)"/></svg><span id="seal-initials"></span></div>
     </div>
     <p class="env-guest" id="env-guest"></p>
-    <p class="env-cta">Toca el sello para abrir</p>
+    <p class="env-cta" data-i18n="envCta">Toca el sello para abrir</p>
   </div>
 
   <!-- ============ INVITACIÓN ============ -->
@@ -1520,13 +1525,13 @@ body { font-size: 1.2rem; font-weight: 500; }
       <div class="flor br" style="--fw:clamp(130px,38vw,210px);--fo:-20px"></div>
       <div class="hero-top">
         <div class="monogram" id="hero-monogram" aria-hidden="true"></div>
-        <p class="eyebrow">¡Nos casamos!</p>
+        <p class="eyebrow" data-i18n="eyebrow">¡Nos casamos!</p>
         <h1 class="names" id="hero-names"></h1>
         <div class="hairline" aria-hidden="true"></div>
         <p class="date" id="hero-date"></p>
       </div>
       <div class="hero-bottom">
-        <a class="scroll-cue" href="#bienvenida" aria-label="Ver la invitación">Desliza<span class="chev"></span></a>
+        <a class="scroll-cue" href="#bienvenida" aria-label="Ver la invitación"><span data-i18n="scroll">Desliza</span><span class="chev"></span></a>
       </div>
     </header>
 
@@ -1541,38 +1546,38 @@ body { font-size: 1.2rem; font-weight: 500; }
 
     <!-- Cuenta regresiva -->
     <section class="section reveal" aria-label="Cuenta regresiva">
-      <h2 class="section-title">Faltan</h2>
+      <h2 class="section-title" data-i18n="faltan">Faltan</h2>
       <div class="countdown" id="countdown">
-        <div class="cd-item"><span class="cd-num" id="cd-d">0</span><span class="cd-label">días</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-d">0</span><span class="cd-label" data-i18n="dias">días</span></div>
         <div class="cd-sep">·</div>
-        <div class="cd-item"><span class="cd-num" id="cd-h">0</span><span class="cd-label">horas</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-h">0</span><span class="cd-label" data-i18n="horas">horas</span></div>
         <div class="cd-sep">·</div>
-        <div class="cd-item"><span class="cd-num" id="cd-m">0</span><span class="cd-label">min</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-m">0</span><span class="cd-label" data-i18n="min">min</span></div>
         <div class="cd-sep">·</div>
-        <div class="cd-item"><span class="cd-num" id="cd-s">0</span><span class="cd-label">seg</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-s">0</span><span class="cd-label" data-i18n="seg">seg</span></div>
       </div>
-      <button class="btn-outline" id="btn-calendar">Agendar en mi calendario</button>
+      <button class="btn-outline" id="btn-calendar" data-i18n="agendar">Agendar en mi calendario</button>
     </section>
 
     <!-- Ceremonia y recepción -->
     <section class="section reveal">
-      <h2 class="section-title">¿Cuándo y dónde?</h2>
+      <h2 class="section-title" data-i18n="cuando">¿Cuándo y dónde?</h2>
       <div class="cards">
         <article class="card" id="cer-card">
           <p class="card-icon" aria-hidden="true">💍</p>
-          <h3 class="card-title">Ceremonia</h3>
+          <h3 class="card-title" data-i18n="ceremonia">Ceremonia</h3>
           <p class="card-name" id="cer-nombre"></p>
           <p class="card-detail" id="cer-dir"></p>
           <p class="card-time" id="cer-hora"></p>
-          <a class="btn-gold" id="cer-maps" target="_blank" rel="noopener">Ver ubicación</a>
+          <a class="btn-gold" id="cer-maps" target="_blank" rel="noopener" data-i18n="verUbicacion">Ver ubicación</a>
         </article>
         <article class="card" id="rec-card">
           <p class="card-icon" aria-hidden="true">🥂</p>
-          <h3 class="card-title">Recepción</h3>
+          <h3 class="card-title" data-i18n="recepcion">Recepción</h3>
           <p class="card-name" id="rec-nombre"></p>
           <p class="card-detail" id="rec-dir"></p>
           <p class="card-time" id="rec-hora"></p>
-          <a class="btn-gold" id="rec-maps" target="_blank" rel="noopener">Ver ubicación</a>
+          <a class="btn-gold" id="rec-maps" target="_blank" rel="noopener" data-i18n="verUbicacion">Ver ubicación</a>
         </article>
       </div>
       <div class="map-wrap" id="map-wrap" hidden>
@@ -1585,7 +1590,7 @@ body { font-size: 1.2rem; font-weight: 500; }
 
     <!-- Dress code -->
     <section class="section reveal">
-      <h2 class="section-title">Código de vestimenta</h2>
+      <h2 class="section-title" data-i18n="vestimenta">Código de vestimenta</h2>
       <p class="dress-title" id="dress-titulo"></p>
       <p class="dress-note" id="dress-nota"></p>
     </section>
@@ -1602,17 +1607,17 @@ body { font-size: 1.2rem; font-weight: 500; }
 
     <!-- Mesa de regalos -->
     <section class="section reveal" id="sec-regalos">
-      <p class="script-kicker">Con cariño</p>
-      <h2 class="section-title">Regalos</h2>
+      <p class="script-kicker" data-i18n="conCarino">Con cariño</p>
+      <h2 class="section-title" data-i18n="regalos">Regalos</h2>
       <article class="gift-letter" id="gift-letter">
         <div class="gl-corner tl" aria-hidden="true"></div>
         <div class="gl-corner br" aria-hidden="true"></div>
         <div class="gl-seal" aria-hidden="true"><span id="gl-seal-txt"></span></div>
-        <p class="gl-greeting">Queridos familiares y amigos,</p>
+        <p class="gl-greeting" data-i18n="queridos">Queridos familiares y amigos,</p>
         <p class="gl-msg" id="gift-msg"></p>
         <div class="gl-rule" aria-hidden="true"><span></span></div>
         <div class="gl-accounts" id="bank-box"></div>
-        <p class="gl-sign">Con amor,<br /><span id="gl-sign-names"></span></p>
+        <p class="gl-sign"><span data-i18n="conAmor">Con amor,</span><br /><span id="gl-sign-names"></span></p>
       </article>
     </section>
 
@@ -1620,16 +1625,16 @@ body { font-size: 1.2rem; font-weight: 500; }
     <section class="section reveal rsvp" id="rsvp">
       <div class="flor tl" style="--fw:150px;--fo:-34px"></div>
       <div class="flor br" style="--fw:150px;--fo:-34px"></div>
-      <h2 class="section-title">Confirma tu asistencia</h2>
+      <h2 class="section-title" data-i18n="confirma">Confirma tu asistencia</h2>
       <p class="rsvp-passes" id="rsvp-passes"></p>
       <p class="rsvp-deadline" id="rsvp-deadline"></p>
       <form class="rsvp-form" id="rsvp-form" novalidate>
         <div class="rf-choice" role="radiogroup" aria-label="¿Asistirás?">
-          <button type="button" class="rf-opt" data-v="si" role="radio" aria-checked="false">Sí, asistiré</button>
-          <button type="button" class="rf-opt" data-v="no" role="radio" aria-checked="false">No podré asistir</button>
+          <button type="button" class="rf-opt" data-v="si" role="radio" aria-checked="false" data-i18n="si">Sí, asistiré</button>
+          <button type="button" class="rf-opt" data-v="no" role="radio" aria-checked="false" data-i18n="no">No podré asistir</button>
         </div>
         <div class="rf-count" id="rf-count" hidden>
-          <span>¿Cuántas personas asistirán?</span>
+          <span data-i18n="cuantas">¿Cuántas personas asistirán?</span>
           <div class="rf-stepper">
             <button type="button" id="rf-minus" aria-label="Una persona menos">−</button>
             <b id="rf-n">1</b>
@@ -1638,13 +1643,13 @@ body { font-size: 1.2rem; font-weight: 500; }
           <small id="rf-max"></small>
         </div>
         <p class="rf-error" id="rf-error" role="alert"></p>
-        <button type="submit" class="btn-gold btn-lg" id="rf-send">Enviar respuesta</button>
+        <button type="submit" class="btn-gold btn-lg" id="rf-send" data-i18n="enviar">Enviar respuesta</button>
       </form>
-      <p class="rf-nolink" id="rf-nolink" hidden>Para confirmar, abre el enlace personal que te enviamos.</p>
+      <p class="rf-nolink" id="rf-nolink" hidden data-i18n="nolink">Para confirmar, abre el enlace personal que te enviamos.</p>
       <div class="rsvp-done" id="rsvp-done" hidden>
         <p class="rd-title" id="rd-title"></p>
         <p class="rd-text" id="rd-text"></p>
-        <button type="button" class="link-btn" id="rd-change">Cambiar mi respuesta</button>
+        <button type="button" class="link-btn" id="rd-change" data-i18n="cambiar">Cambiar mi respuesta</button>
       </div>
     </section>
 
@@ -1652,7 +1657,7 @@ body { font-size: 1.2rem; font-weight: 500; }
     <footer class="footer reveal">
       <figure class="final-photo" data-slot="final"><img alt="Benjamín y Talina" loading="lazy" /></figure>
       <p class="footer-names" id="footer-names"></p>
-      <p class="footer-thanks">¡Te esperamos!</p>
+      <p class="footer-thanks" data-i18n="esperamos">¡Te esperamos!</p>
     </footer>
   </main>
 
@@ -1664,6 +1669,11 @@ body { font-size: 1.2rem; font-weight: 500; }
   <audio id="bg-music" loop preload="none"></audio>
 
 <script>
+/* Mientras se carga la invitación personal, el texto del sobre espera (evita ver el idioma equivocado) */
+if (/[?&]i=/.test(location.search) && !/[?&]lang=/.test(location.search)) {
+  document.documentElement.classList.add("i18n-wait");
+  setTimeout(() => document.documentElement.classList.remove("i18n-wait"), 2500);
+}
 /* Flores y palomas (imágenes recortadas) */
 window.ASSETS = {
   flor: "/media/flor.webp",
@@ -1750,6 +1760,8 @@ const CONFIG = {
         { banco: "Banco BHD",     numero: "38271650010" },
         { banco: "Banco Popular", numero: "821540374" },
       ],
+      // Cuenta que ven los invitados de la versión en inglés
+      cuentasEn: [],
     },
 
     // Nota juguetona al final de la mesa de regalos
@@ -1812,17 +1824,72 @@ document.addEventListener("DOMContentLoaded", function () {
   let guest = "";
   let pases = 0;
   let totalPersonas = 1;
-  const textoDePases = (p) => p === 0
-    ? "Invitación personal (1 persona)"
-    : `Tu invitación incluye ${p} acompañante${p > 1 ? "s" : ""} · ${p + 1} personas en total`;
+  const textoDePases = (p) => T.pases(p);
   let textoPases = "";
+
+  /* --- Idioma: español por defecto; inglés con ?lang=en o si la invitación es en inglés --- */
+  const I18N = {
+    es: {
+      envHint: "Tienes una invitación", envSub: "Nos casamos", envCta: "Toca el sello para abrir", para: "Para",
+      eyebrow: "¡Nos casamos!", scroll: "Desliza", faltan: "Faltan", dias: "días", horas: "horas", min: "min", seg: "seg",
+      agendar: "Agendar en mi calendario", cuando: "¿Cuándo y dónde?", ceremonia: "Ceremonia", recepcion: "Recepción",
+      ceremoniaYRecepcion: "Ceremonia y recepción", verUbicacion: "Ver ubicación", vestimenta: "Código de vestimenta",
+      conCarino: "Con cariño", regalos: "Regalos", queridos: "Queridos familiares y amigos,", conAmor: "Con amor,",
+      giftMsg: "Su presencia es nuestro mejor regalo; sin embargo, si desean tener un detalle con nosotros, pueden hacerlo aquí:",
+      copiarNumero: "Copiar número", copiado: "Copiado ✓",
+      confirma: "Confirma tu asistencia", si: "Sí, asistiré", no: "No podré asistir", cuantas: "¿Cuántas personas asistirán?",
+      enviar: "Enviar respuesta", enviando: "Enviando…", nolink: "Para confirmar, abre el enlace personal que te enviamos.",
+      cambiar: "Cambiar mi respuesta", esperamos: "¡Te esperamos!",
+      fecha: "Sábado, 7 de Noviembre de 2026", fechaLimite: "24 de Octubre de 2026",
+      frase: "El amor es paciente, el amor es bondadoso.", fraseAutor: "1 Corintios 13:4",
+      dressTitulo: "Formal / Etiqueta", dressNota: "Reservamos el color blanco para la novia.",
+      deadline: (f) => `Por favor confirma antes del ${f}.`,
+      pases: (p) => p === 0 ? "Invitación personal (1 persona)" : `Tu invitación incluye ${p} acompañante${p > 1 ? "s" : ""} · ${p + 1} personas en total`,
+      maxP: (n) => `Tu invitación es para ${n} personas.`,
+      gracias: (g) => `¡Gracias, ${g}!`, graciasNo: (g) => `Gracias por avisarnos, ${g}`,
+      hechoVarios: (n) => `Confirmaste ${n} personas. ¡Los esperamos con mucha ilusión!`,
+      hechoUno: "Confirmaste 1 persona. ¡Te esperamos con mucha ilusión!",
+      hechoSolo: "Confirmaste tu asistencia. ¡Te esperamos con mucha ilusión!",
+      hechoNo: "Te vamos a extrañar. Gracias por responder.",
+      elige: "Elige si asistirás o no.", errorEnvio: "No se pudo enviar. Revisa tu conexión a internet e inténtalo de nuevo.",
+      calTitulo: (a, b) => `Boda de ${a} y ${b}`, calDetalle: "¡Acompáñanos en nuestro gran día!",
+      titulo: (a, b) => `Boda de ${a} & ${b}`,
+    },
+    en: {
+      envHint: "You're invited", envSub: "We're getting married", envCta: "Tap the seal to open", para: "To",
+      eyebrow: "We're getting married!", scroll: "Scroll", faltan: "Counting down", dias: "days", horas: "hours", min: "min", seg: "sec",
+      agendar: "Add to my calendar", cuando: "When & where", ceremonia: "Ceremony", recepcion: "Reception",
+      ceremoniaYRecepcion: "Ceremony & reception", verUbicacion: "View location", vestimenta: "Dress code",
+      conCarino: "With love", regalos: "Gifts", queridos: "Dear family and friends,", conAmor: "With love,",
+      giftMsg: "Your presence is our greatest gift; however, if you would like to give us something, you can do so here:",
+      copiarNumero: "Copy number", copiado: "Copied ✓",
+      confirma: "Kindly RSVP", si: "Joyfully accept", no: "Regretfully decline", cuantas: "How many guests will attend?",
+      enviar: "Send response", enviando: "Sending…", nolink: "To RSVP, please open the personal link we sent you.",
+      cambiar: "Change my response", esperamos: "We can't wait to see you!",
+      fecha: "Saturday, November 7, 2026", fechaLimite: "October 24, 2026",
+      frase: "Love is patient, love is kind.", fraseAutor: "1 Corinthians 13:4",
+      dressTitulo: "Formal / Black tie", dressNota: "We kindly ask that white be reserved for the bride.",
+      deadline: (f) => `Please respond by ${f}.`,
+      pases: (p) => p === 0 ? "Personal invitation (1 person)" : p === 1 ? "Your invitation includes a plus-one · 2 people in total" : `Your invitation includes ${p} additional guests · ${p + 1} people in total`,
+      maxP: (n) => `Your invitation is for ${n} people.`,
+      gracias: (g) => `Thank you, ${g}!`, graciasNo: (g) => `Thank you for letting us know, ${g}`,
+      hechoVarios: (n) => `You confirmed ${n} people. We can't wait to celebrate with you!`,
+      hechoUno: "You confirmed 1 person. We can't wait to celebrate with you!",
+      hechoSolo: "You're confirmed. We can't wait to celebrate with you!",
+      hechoNo: "We'll miss you. Thank you for responding.",
+      elige: "Please choose whether you will attend.", errorEnvio: "We couldn't send your response. Please check your internet connection and try again.",
+      calTitulo: (a, b) => `${a} & ${b}'s wedding`, calDetalle: "Join us on our big day!",
+      titulo: (a, b) => `${a} & ${b}'s Wedding`,
+    },
+  };
+  let lang = /^en/i.test(params.get("lang") || "") ? "en" : "es";
+  let T = I18N[lang];
 
   /* --- Sobre --- */
   const namesShort = `${C.novio} & ${C.novia}`;
   $("env-names").textContent = namesShort;
   $("seal-initials").textContent = C.iniciales;
-  if ($("env-date")) $("env-date").textContent = C.fechaTexto;
-  if (guest) $("env-guest").textContent = `Para: ${guest}`;
+  // (fecha, frase y demás textos se pintan en aplicaIdioma)
 
   const envelope = $("envelope");
   const screen = $("envelope-screen");
@@ -1911,10 +1978,7 @@ document.addEventListener("DOMContentLoaded", function () {
   /* --- Hero --- */
   $("hero-names").innerHTML =
     `${C.novio} <span class="amp">&amp;</span> ${C.novia}`;
-  $("hero-date").textContent = C.fechaTexto;
   $("hero-monogram").textContent = C.iniciales;
-  $("hero-quote").textContent = `“${C.frase}”`;
-  $("hero-quote-author").textContent = C.fraseAutor ? `— ${C.fraseAutor}` : "";
   if (guest) {
     $("guest-line").textContent = guest;
     $("guest-passes").textContent = textoPases;
@@ -1946,9 +2010,9 @@ document.addEventListener("DOMContentLoaded", function () {
       "T" + pad(endDate.getHours()) + pad(endDate.getMinutes()) + "00";
     const url =
       "https://calendar.google.com/calendar/render?action=TEMPLATE" +
-      "&text=" + encodeURIComponent(`Boda de ${C.novio} y ${C.novia}`) +
+      "&text=" + encodeURIComponent(T.calTitulo(C.novio, C.novia)) +
       "&dates=" + start + "/" + end +
-      "&details=" + encodeURIComponent("¡Acompáñanos en nuestro gran día!") +
+      "&details=" + encodeURIComponent(T.calDetalle) +
       "&location=" + encodeURIComponent(`${C.ceremonia.nombre}, ${C.ceremonia.direccion}`);
     window.open(url, "_blank", "noopener");
   });
@@ -1965,9 +2029,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Una sola tarjeta: "Ceremonia y recepción"
     document.querySelector(".cards").classList.add("single");
     $("rec-card").remove();
-    document.querySelector("#cer-card .card-title").textContent = "Ceremonia y recepción";
-    $("cer-hora").textContent =
-      `Ceremonia ${C.ceremonia.hora} · Recepción ${C.recepcion.hora}`;
+    // título y horario se pintan en aplicaIdioma
   } else {
     $("rec-nombre").textContent = C.recepcion.nombre;
     $("rec-dir").textContent = C.recepcion.direccion;
@@ -1988,8 +2050,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   /* --- Dress code --- */
-  $("dress-titulo").textContent = C.dressCode.titulo;
-  $("dress-nota").textContent = C.dressCode.nota;
+  // código de vestimenta: en aplicaIdioma
 
   /* --- Fotos: inicio, rollo y final --- */
   const SLOTS = [
@@ -2234,34 +2295,72 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* --- Regalos: solo las cuentas para un detalle en efectivo --- */
+  let pintaCuentas = () => {};
   (function () {
     const R = C.regalos || {};
     const cu = R.cuenta;
-    if (!cu || !cu.cuentas || !cu.cuentas.length) { $("sec-regalos").remove(); return; }
-    $("gift-msg").textContent = "Su presencia es nuestro mejor regalo; sin embargo, si desean tener un detalle con nosotros, pueden hacerlo aquí:";
+    if (!cu) { $("sec-regalos").remove(); return; }
     $("gl-seal-txt").textContent = C.iniciales || "";
     $("gl-sign-names").textContent = `${C.novio} & ${C.novia}`;
-    const box = $("bank-box");
-    cu.cuentas.forEach((c) => {
-      const row = document.createElement("div");
-      row.className = "gl-account";
-      row.innerHTML = `<p class="gl-bank"></p><p class="gl-number"></p><button type="button" class="gl-copy">Copiar número</button>`;
-      row.querySelector(".gl-bank").textContent = c.banco;
-      row.querySelector(".gl-number").textContent = c.numero;
-      const b = row.querySelector(".gl-copy");
-      b.addEventListener("click", async () => {
-        let ok = false;
-        try { await navigator.clipboard.writeText(c.numero); ok = true; } catch {}
-        if (!ok) {
-          const t = document.createElement("textarea"); t.value = c.numero; document.body.appendChild(t); t.select();
-          try { ok = document.execCommand("copy"); } catch {} t.remove();
-        }
-        b.textContent = ok ? "Copiado ✓" : c.numero;
-        setTimeout(() => (b.textContent = "Copiar número"), 2200);
+    pintaCuentas = function () {
+      const lista = (lang === "en" ? cu.cuentasEn : cu.cuentas) || [];
+      $("sec-regalos").hidden = !lista.length;
+      $("gift-msg").textContent = T.giftMsg;
+      const box = $("bank-box"); box.innerHTML = "";
+      lista.forEach((c) => {
+        const row = document.createElement("div");
+        row.className = "gl-account";
+        row.innerHTML = `<p class="gl-bank"></p><p class="gl-number"></p><button type="button" class="gl-copy"></button>`;
+        row.querySelector(".gl-bank").textContent = c.banco;
+        row.querySelector(".gl-number").textContent = c.numero;
+        (c.lineas || []).forEach(([k, v]) => {
+          const p = document.createElement("p"); p.className = "gl-line";
+          p.innerHTML = "<span></span> <b></b>";
+          p.querySelector("span").textContent = k; p.querySelector("b").textContent = v;
+          row.insertBefore(p, row.querySelector(".gl-copy"));
+        });
+        const b = row.querySelector(".gl-copy");
+        b.textContent = T.copiarNumero;
+        b.addEventListener("click", async () => {
+          let ok = false;
+          try { await navigator.clipboard.writeText(c.numero); ok = true; } catch {}
+          if (!ok) {
+            const t = document.createElement("textarea"); t.value = c.numero; document.body.appendChild(t); t.select();
+            try { ok = document.execCommand("copy"); } catch {} t.remove();
+          }
+          b.textContent = ok ? T.copiado : c.numero;
+          setTimeout(() => (b.textContent = T.copiarNumero), 2200);
+        });
+        box.appendChild(row);
       });
-      box.appendChild(row);
-    });
+    };
   })();
+
+  function aplicaIdioma(l) {
+    lang = l === "en" ? "en" : "es"; T = I18N[lang];
+    document.documentElement.lang = lang;
+    document.title = T.titulo(C.novio, C.novia);
+    document.querySelectorAll("[data-i18n]").forEach((el) => { const v = T[el.dataset.i18n]; if (typeof v === "string") el.textContent = v; });
+    if ($("env-date")) $("env-date").textContent = T.fecha;
+    $("hero-date").textContent = T.fecha;
+    $("hero-quote").textContent = `“${T.frase}”`;
+    $("hero-quote-author").textContent = `— ${T.fraseAutor}`;
+    if (mismoLugar) {
+      document.querySelector("#cer-card .card-title").textContent = T.ceremoniaYRecepcion;
+      $("cer-hora").textContent = `${T.ceremonia} ${C.ceremonia.hora} · ${T.recepcion} ${C.recepcion.hora}`;
+    }
+    $("dress-titulo").textContent = T.dressTitulo;
+    $("dress-nota").textContent = T.dressNota;
+    $("rsvp-deadline").textContent = T.deadline(T.fechaLimite);
+    pintaCuentas();
+    if (guest) {
+      textoPases = textoDePases(pases);
+      $("env-guest").textContent = `${T.para}: ${guest}`;
+      $("guest-passes").textContent = textoPases;
+      $("rsvp-passes").textContent = textoPases;
+      $("rf-max").textContent = maxPersonas > 1 ? T.maxP(maxPersonas) : "";
+    }
+  }
 
 
   /* --- Pétalos cayendo suavemente por los laterales --- */
@@ -2298,8 +2397,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return res.json();
   }
 
-  $("rsvp-deadline").textContent = `Por favor confirma antes del ${C.rsvp.fechaLimite}.`;
   let resp = null, cuantos = 1, maxPersonas = 1;
+  aplicaIdioma(lang);
   $("rsvp-form").hidden = true;
   $("rf-nolink").hidden = false;
   const pintaContador = () => {
@@ -2319,11 +2418,10 @@ document.addEventListener("DOMContentLoaded", function () {
   function mostrarHecho(asiste, personas) {
     $("rsvp-form").hidden = true;
     $("rsvp-done").hidden = false;
-    $("rd-title").textContent = asiste ? `¡Gracias, ${guest}!` : `Gracias por avisarnos, ${guest}`;
+    $("rd-title").textContent = asiste ? T.gracias(guest) : T.graciasNo(guest);
     $("rd-text").textContent = asiste
-      ? (personas > 1 ? `Confirmaste ${personas} personas. ¡Los esperamos con mucha ilusión!`
-         : (maxPersonas > 1 ? "Confirmaste 1 persona. ¡Te esperamos con mucha ilusión!" : "Confirmaste tu asistencia. ¡Te esperamos con mucha ilusión!"))
-      : "Te vamos a extrañar. Gracias por responder.";
+      ? (personas > 1 ? T.hechoVarios(personas) : (maxPersonas > 1 ? T.hechoUno : T.hechoSolo))
+      : T.hechoNo;
   }
   $("rd-change").addEventListener("click", () => { $("rsvp-done").hidden = true; $("rsvp-form").hidden = false; });
 
@@ -2334,11 +2432,8 @@ document.addEventListener("DOMContentLoaded", function () {
     totalPersonas = maxPersonas;
     textoPases = textoDePases(pases);
     cuantos = maxPersonas;
-    $("env-guest").textContent = `Para: ${guest}`;
     $("guest-line").textContent = guest;
-    $("guest-passes").textContent = textoPases;
-    $("rsvp-passes").textContent = textoPases;
-    $("rf-max").textContent = maxPersonas > 1 ? `Tu invitación es para ${maxPersonas} personas.` : "";
+    aplicaIdioma(params.get("lang") ? lang : (g.idioma || lang));
     pintaContador();
     $("rf-nolink").hidden = true;
     if (g.asiste === true || g.asiste === false) mostrarHecho(g.asiste, g.confirmadas || 0);
@@ -2347,22 +2442,23 @@ document.addEventListener("DOMContentLoaded", function () {
   if (codigo && SB.url) {
     rpc("invitacion_datos", { p_codigo: codigo })
       .then((g) => { if (g && g.nombre) aplicarInvitado(g); })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => document.documentElement.classList.remove("i18n-wait"));
   }
 
   $("rsvp-form").addEventListener("submit", async (e) => {
     e.preventDefault();
     if (!guest) return;
-    if (!resp) { $("rf-error").textContent = "Elige si asistirás o no."; return; }
+    if (!resp) { $("rf-error").textContent = T.elige; return; }
     const btn = $("rf-send");
-    btn.disabled = true; btn.textContent = "Enviando…";
+    btn.disabled = true; btn.textContent = T.enviando;
     try {
       const r = await rpc("confirmar_asistencia", { p_codigo: codigo, p_asiste: resp === "si", p_personas: resp === "si" ? cuantos : 0 });
       mostrarHecho(r.asiste, r.confirmadas || 0);
     } catch {
-      $("rf-error").textContent = "No se pudo enviar. Revisa tu conexión a internet e inténtalo de nuevo.";
+      $("rf-error").textContent = T.errorEnvio;
     } finally {
-      btn.disabled = false; btn.textContent = "Enviar respuesta";
+      btn.disabled = false; btn.textContent = T.enviar;
     }
   });
 
@@ -2392,6 +2488,9 @@ document.addEventListener("DOMContentLoaded", function () {
             <p class="pn-add-title">Agregar invitado</p>
             <div class="pn-add-row">
               <input type="text" id="pn-add-name" placeholder="Nombre del invitado" aria-label="Nombre del invitado" required />
+              <select id="pn-add-lang" aria-label="Idioma de la invitación">
+                <option value="es">Español</option><option value="en">Inglés</option>
+              </select>
               <select id="pn-add-n" aria-label="Personas">
                 <option value="1">1 persona</option><option value="2">2 personas</option><option value="3">3 personas</option>
                 <option value="4">4 personas</option><option value="5">5 personas</option>
@@ -2449,12 +2548,18 @@ document.addEventListener("DOMContentLoaded", function () {
         const etiqueta = estado === "si" ? `Asistirá${p > 1 ? ` · ${f.confirmadas} de ${p}` : ""}` : estado === "no" ? "No asistirá" : "Sin responder";
         const li = document.createElement("li");
         li.className = "pn-row " + estado;
-        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
+        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
         li.querySelector(".pn-who b").textContent = f.nombre;
         li.querySelector(".pn-confirm b").textContent = f.nombre;
         li.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(`${baseLink}?i=${f.codigo}`, ev.currentTarget));
         const conf = li.querySelector(".pn-confirm");
-        li.querySelector(".pn-del").addEventListener("click", () => { conf.hidden = false; li.querySelector(".pn-cancel").focus(); });
+        li.querySelector(".pn-del:not(.pn-idioma)").addEventListener("click", () => { conf.hidden = false; li.querySelector(".pn-cancel").focus(); });
+        li.querySelector(".pn-idioma").addEventListener("click", async (ev) => {
+          const b = ev.currentTarget, nuevo = f.idioma === "en" ? "es" : "en";
+          b.disabled = true; b.textContent = "Cambiando…";
+          try { await rpc("cambiar_idioma", { p_clave: clave, p_codigo: f.codigo, p_idioma: nuevo }); f.idioma = nuevo; pinta(); }
+          catch { b.disabled = false; b.textContent = "No se pudo, reintenta"; }
+        });
         li.querySelector(".pn-cancel").addEventListener("click", () => { conf.hidden = true; });
         li.querySelector(".pn-yes").addEventListener("click", async (ev) => {
           const b = ev.currentTarget; b.disabled = true; b.textContent = "Quitando…";
@@ -2494,13 +2599,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!nombre) { msg.textContent = "Escribe el nombre del invitado."; return; }
       const btn = $("pn-add-btn"); btn.disabled = true; btn.textContent = "Agregando…";
       try {
-        const g = await rpc("agregar_invitado", { p_clave: clave, p_nombre: nombre, p_personas: personas });
+        const g = await rpc("agregar_invitado", { p_clave: clave, p_nombre: nombre, p_personas: personas, p_idioma: $("pn-add-lang").value });
         const link = `${baseLink}?i=${g.codigo}`;
         msg.innerHTML = `<b></b> agregado. Su enlace: <span class="pn-add-link"></span> <button type="button" class="pn-copy">Copiar enlace</button>`;
         msg.querySelector("b").textContent = g.nombre;
         msg.querySelector(".pn-add-link").textContent = link;
         msg.querySelector(".pn-copy").addEventListener("click", (ev) => copiar(link, ev.currentTarget));
-        $("pn-add-name").value = ""; $("pn-add-n").value = "1";
+        $("pn-add-name").value = ""; $("pn-add-n").value = "1"; $("pn-add-lang").value = "es";
         await carga();
       } catch {
         msg.textContent = "No se pudo agregar. Revisa tu conexión e inténtalo de nuevo.";
