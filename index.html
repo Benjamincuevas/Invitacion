@@ -1494,7 +1494,7 @@ html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-
 .pv-status.warn { background: #fbefd9; color: #9a6b1f; }
 .pv-status.bad { background: #f6e1e4; color: var(--wine); }
 .pv-name { font-family: "Cormorant Garamond", serif; font-weight: 600; font-size: clamp(2rem, 9vw, 2.8rem); line-height: 1.1; color: var(--ink); overflow-wrap: anywhere; }
-.pv-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.pv-grid { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.6rem; }
 .pv-grid > div { border: 1px solid var(--gold-pale); border-radius: 4px; padding: 0.8rem 0.35rem; display: grid; gap: 0.25rem; align-content: start; }
 .pv-grid span { font-family: var(--serif-display); font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); }
 .pv-grid b { font-family: var(--serif-display); font-weight: 400; font-size: clamp(1.8rem, 9vw, 2.6rem); line-height: 1.05; color: var(--wine); overflow-wrap: anywhere; }
@@ -2929,13 +2929,12 @@ document.addEventListener("DOMContentLoaded", function () {
         <div class="pv-grid">
           <div><span>Personas</span><b>${estado === "ok" ? conf : n}</b><small>${estado === "ok" ? (conf < n ? `de ${n} en la invitación` : conf === 1 ? "persona" : "personas") : "en la invitación"}</small></div>
           <div><span>Mesa</span><b>${g.mesa || "—"}</b>${g.mesa ? "" : "<small>Sin asignar</small>"}</div>
-          <div><span>${(estado === "ok" ? conf : n) > 1 ? "Sillas" : "Silla"}</span><b class="pv-sillas"></b>${sil ? "" : "<small>Sin asignar</small>"}</div>
+          ${sil ? `<div><span>${(estado === "ok" ? conf : n) > 1 ? "Sillas" : "Silla"}</span><b class="pv-sillas"></b></div>` : ""}
         </div>
         <p class="pv-foot">Código ${paseCod.toUpperCase()} · ${new Date().toLocaleTimeString("es-DO", { hour: "numeric", minute: "2-digit" })}</p>`;
       card.querySelector(".pv-name").textContent = g.nombre;
       const bs = card.querySelector(".pv-sillas");
-      bs.textContent = sil || "—";
-      bs.classList.toggle("largo", sil.length > 4);
+      if (bs) { bs.textContent = sil; bs.classList.toggle("largo", sil.length > 4); }
       document.title = `Pase · ${g.nombre}`;
     }
     cargaPase();
