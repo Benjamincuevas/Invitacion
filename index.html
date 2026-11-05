@@ -1502,6 +1502,9 @@ html.i18n-wait #envelope-screen .env-hint, html.i18n-wait #envelope-screen .env-
 .pv-grid small { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 0.95rem; color: var(--ink-soft); line-height: 1.2; }
 .pv-msg { font-family: "Cormorant Garamond", serif; font-style: italic; font-size: 1.25rem; color: var(--ink-soft); }
 .pv-foot { font-size: 0.85rem; color: var(--ink-soft); }
+#qr-card { justify-items: center; gap: 0.8rem; }
+#qr-card .pase-qr { max-width: 280px; }
+#qr-card .pase-name { font-size: 1.9rem; }
 .pv-retry { justify-self: center; font-family: var(--serif-display); font-size: 0.7rem; letter-spacing: 0.16em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; border: 0; border-radius: 2px; padding: 0.8rem 1.3rem; cursor: pointer; }
 
 /* Panel: mesas y sillas */
@@ -2562,8 +2565,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if ($("pase").hidden) return;
     $("pase").scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
   });
-  $("pase-save").addEventListener("click", async () => {
-    const btn = $("pase-save");
+  $("pase-save").addEventListener("click", () =>
+    descargaPase({ nombre: guest, cod: codigo, n: paseN, mesa, sillas }, T, $("pase-save")));
+  // Genera la imagen del pase (QR + datos) y la comparte o la descarga
+  async function descargaPase(d, T, btn) {
+    const guest = d.nombre, codigo = d.cod, paseN = d.n, mesa = d.mesa, sillas = d.sillas;
     btn.disabled = true; btn.textContent = T.paseGuardando;
     try {
       if (document.fonts && document.fonts.load) {
@@ -2613,7 +2619,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } finally {
       btn.disabled = false; btn.textContent = T.paseGuardar;
     }
-  });
+  }
 
   function aplicarInvitado(g) {
     guest = g.nombre;
@@ -2771,12 +2777,12 @@ document.addEventListener("DOMContentLoaded", function () {
         const etiqueta = estado === "si" ? `Asistirá${p > 1 ? ` · ${f.confirmadas} de ${p}` : ""}` : estado === "no" ? "No asistirá" : "Sin responder";
         const li = document.createElement("li");
         li.className = "pn-row " + estado;
-        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-seat"><label>Mesa <input type="number" class="pn-mesa" min="1" max="99" inputmode="numeric" aria-label="Mesa" /></label><label>${p > 1 ? "Sillas" : "Silla"} <input type="text" class="pn-sillas" maxlength="40" placeholder="${p > 1 ? "Ej. 3 y 4" : "Ej. 3"}" aria-label="Silla" /></label><span class="pn-seat-msg" role="status"></span>${estado === "si" ? `<a class="pn-pase" target="_blank" rel="noopener">Ver pase</a>` : ""}</div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
+        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-seat"><label>Mesa <input type="number" class="pn-mesa" min="1" max="99" inputmode="numeric" aria-label="Mesa" /></label><label>${p > 1 ? "Sillas" : "Silla"} <input type="text" class="pn-sillas" maxlength="40" placeholder="${p > 1 ? "Ej. 3 y 4" : "Ej. 3"}" aria-label="Silla" /></label><span class="pn-seat-msg" role="status"></span>${estado !== "no" ? `<a class="pn-pase" target="_blank" rel="noopener">Ver código QR</a>` : ""}</div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
         li.querySelector(".pn-who b").textContent = f.nombre;
         li.querySelector(".pn-confirm b").textContent = f.nombre;
         const inMesa = li.querySelector(".pn-mesa"), inSillas = li.querySelector(".pn-sillas"), seatMsg = li.querySelector(".pn-seat-msg");
         inMesa.value = f.mesa || ""; inSillas.value = f.sillas || "";
-        const lnk = li.querySelector(".pn-pase"); if (lnk) lnk.href = `${location.origin}/?pase=${f.codigo}`;
+        const lnk = li.querySelector(".pn-pase"); if (lnk) lnk.href = `${location.origin}/?qr=${f.codigo}`;
         let cola = Promise.resolve();
         const guardaSeat = () => (cola = cola.then(guardaReal, guardaReal));
         const guardaReal = async () => {
@@ -2933,6 +2939,54 @@ document.addEventListener("DOMContentLoaded", function () {
       document.title = `Pase · ${g.nombre}`;
     }
     cargaPase();
+  }
+
+  /* --- Código QR del invitado en pantalla completa: ?qr=CODIGO (enlace "Ver código QR" del panel) --- */
+  const qrCod = (params.get("qr") || "").trim().toLowerCase();
+  if (qrCod && !paseCod) {
+    const vista = document.createElement("div");
+    vista.id = "pase-view";
+    vista.innerHTML = `<div class="pv-card" id="qr-card"><p class="pv-msg">…</p></div>`;
+    document.body.appendChild(vista);
+    $("envelope-screen") && ($("envelope-screen").style.display = "none");
+    const card = $("qr-card");
+    async function cargaQr() {
+      let g;
+      try { g = await rpc("invitacion_datos", { p_codigo: qrCod }); }
+      catch {
+        card.innerHTML = `<p class="pv-msg">No se pudo cargar. Revisa la conexión a internet.</p><button type="button" class="pv-retry">Intentar de nuevo</button>`;
+        card.querySelector(".pv-retry").addEventListener("click", cargaQr);
+        return;
+      }
+      if (!g || !g.nombre) {
+        card.innerHTML = `<p class="pv-status bad">Código no válido</p><p class="pv-msg">Este código no corresponde a ninguna invitación.</p>`;
+        return;
+      }
+      const tr = I18N[g.idioma === "en" ? "en" : "es"];
+      const total = Math.max(1, g.personas || 1);
+      const n = g.asiste === true ? Math.max(1, Math.min(total, g.confirmadas || 1)) : total;
+      const sil = (g.sillas || "").trim();
+      document.documentElement.lang = g.idioma === "en" ? "en" : "es";
+      document.title = `${tr.paseTitulo} · ${g.nombre}`;
+      card.innerHTML = `
+        <p class="pv-kicker">${namesShort}</p>
+        <p class="pase-kicker">${tr.paseTitulo}</p>
+        <div class="pase-qr" role="img" aria-label="QR">${qrSvg(urlPase(qrCod))}</div>
+        <p class="pase-name"></p>
+        <dl class="pase-info">
+          <div><dt>${tr.paseInv}</dt><dd>${n}</dd></div>
+          <div><dt>${tr.paseMesa}</dt><dd class="${g.mesa ? "" : "pend"}">${g.mesa || tr.porAsignar}</dd></div>
+          ${sil ? `<div><dt>${n > 1 ? tr.paseSillas : tr.paseSilla}</dt><dd class="qr-sillas"></dd></div>` : ""}
+        </dl>
+        ${g.asiste === true ? "" : `<p class="pv-status ${g.asiste === false ? "bad" : "warn"}">${g.asiste === false ? "Respondió que no asistirá" : "Aún no ha confirmado asistencia"}</p>`}
+        <p class="pase-note">${tr.paseNota}</p>
+        <button type="button" class="btn-outline pase-save" id="qr-save">${tr.paseGuardar}</button>`;
+      card.querySelector(".pase-name").textContent = g.nombre;
+      if (sil) card.querySelector(".qr-sillas").textContent = sil;
+      $("qr-save").addEventListener("click", () =>
+        descargaPase({ nombre: g.nombre, cod: qrCod, n, mesa: g.mesa || null, sillas: sil }, tr, $("qr-save")));
+    }
+    cargaQr();
   }
 
   /* --- Footer --- */
