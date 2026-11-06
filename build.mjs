@@ -6,6 +6,7 @@ rmSync("dist", { recursive: true, force: true });
 mkdirSync("dist");
 cpSync("media", "dist/media", { recursive: true });
 cpSync("preview.jpg", "dist/preview.jpg");
+cpSync("fotos.html", "dist/fotos.html"); // /fotos: página para subir las fotos de la boda
 const html = readFileSync("index.html", "utf8");
 writeFileSync("dist/index.html", html);
 

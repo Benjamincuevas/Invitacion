@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Comparte tus fotos · Benjamín &amp; Talina</title>
+  <meta name="description" content="Sube las fotos y videos que tomaste en la boda de Benjamín y Talina." />
+  <meta property="og:title" content="Comparte tus fotos de la boda 📸" />
+  <meta property="og:description" content="Sube aquí las fotos y videos que tomaste en la boda de Benjamín y Talina." />
+  <meta name="theme-color" content="#fbf4f0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Cinzel:wght@400;500&family=Pinyon+Script&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ivory: #fbf4f0; --ivory-deep: #f6e4de; --card: #fffdfa;
+      --ink: #3b1a22; --ink-soft: #6e4a52;
+      --gold: #b76e79; --gold-bright: #dea193; --gold-pale: #ecd0c7;
+      --wine: #83072d; --ok: #2f7a4f; --ok-bg: #e4f2e9;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      min-height: 100vh; min-height: 100dvh;
+      background: radial-gradient(ellipse at 50% 0%, #fffdf9 0%, var(--ivory) 45%, var(--ivory-deep) 100%);
+      color: var(--ink); font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.15rem; line-height: 1.55;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+    }
+    .flor { position: fixed; width: min(46vw, 260px); pointer-events: none; z-index: 0; opacity: 0.95; }
+    .flor.tl { top: -18px; left: -22px; }
+    .flor.br { bottom: -18px; right: -22px; transform: rotate(180deg); }
+    main { position: relative; z-index: 1; width: min(100% - 32px, 480px); margin: 0 auto; padding: calc(56px + env(safe-area-inset-top, 0px)) 0 calc(48px + env(safe-area-inset-bottom, 0px)); text-align: center; }
+    .nombres { font-family: "Pinyon Script", cursive; font-size: clamp(2.6rem, 12vw, 3.4rem); line-height: 1.1; color: var(--gold); }
+    .kicker { margin-top: 0.6rem; font-family: "Cinzel", serif; font-size: 0.8rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--wine); }
+    .intro { margin: 1rem auto 0; max-width: 32ch; color: var(--ink-soft); font-style: italic; }
+    .card { margin-top: 1.6rem; background: var(--card); border: 1px solid var(--gold); outline: 1px solid var(--gold-pale); outline-offset: 5px; border-radius: 6px; padding: 1.4rem 1.1rem; display: grid; gap: 1rem; text-align: left; box-shadow: 0 20px 44px -22px rgba(74, 4, 24, 0.35); }
+    label.campo { display: grid; gap: 0.35rem; font-family: "Cinzel", serif; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
+    input[type="text"] { font: 500 1.15rem "Cormorant Garamond", serif; color: var(--ink); background: #fff; border: 1px solid var(--gold-pale); border-radius: 4px; padding: 0.65rem 0.75rem; width: 100%; }
+    input[type="text"]:focus { outline: 2px solid var(--gold-bright); outline-offset: 1px; }
+    .btn { display: flex; align-items: center; justify-content: center; gap: 0.6rem; width: 100%; min-height: 56px; border-radius: 3px; border: 0; cursor: pointer; font-family: "Cinzel", serif; font-size: 0.82rem; letter-spacing: 0.18em; text-transform: uppercase; background: var(--wine); color: #fdf3ec; }
+    .btn svg { width: 22px; height: 22px; }
+    .btn.sec { background: transparent; color: var(--wine); border: 1px solid var(--wine); min-height: 48px; }
+    .btn:disabled { opacity: 0.55; cursor: default; }
+    .nota { font-size: 0.95rem; color: var(--ink-soft); text-align: center; font-style: italic; }
+    .estado { text-align: center; display: grid; gap: 0.5rem; }
+    .estado b { font-family: "Cinzel", serif; font-weight: 400; font-size: 0.85rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--wine); }
+    .barra { height: 8px; border-radius: 99px; background: var(--gold-pale); overflow: hidden; }
+    .barra i { display: block; height: 100%; width: 0; background: var(--wine); transition: width 0.3s ease; }
+    .lista { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 0.5rem; }
+    .lista li { position: relative; aspect-ratio: 1; border-radius: 4px; overflow: hidden; background: var(--ivory-deep); border: 1px solid var(--gold-pale); }
+    .lista img, .lista video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lista .tag { position: absolute; inset: auto 4px 4px auto; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 99px; display: grid; place-items: center; font: 600 0.75rem system-ui, sans-serif; background: rgba(255, 253, 250, 0.92); color: var(--ink-soft); }
+    .lista li.subiendo .tag { color: var(--wine); }
+    .lista li.listo .tag { background: var(--ok-bg); color: var(--ok); }
+    .lista li.error { border-color: var(--wine); }
+    .lista li.error .tag { background: var(--wine); color: #fff; }
+    .gracias { text-align: center; display: grid; gap: 0.4rem; }
+    .gracias .ok { justify-self: center; width: 54px; height: 54px; border-radius: 50%; display: grid; place-items: center; background: var(--ok-bg); color: var(--ok); font-size: 1.6rem; }
+    .gracias p { color: var(--ink-soft); }
+    .gracias strong { font-family: "Cinzel", serif; font-weight: 400; letter-spacing: 0.08em; color: var(--ink); font-size: 1.05rem; }
+    [hidden] { display: none !important; }
+    .pie { margin-top: 2rem; font-family: "Cinzel", serif; font-size: 0.7rem; letter-spacing: 0.24em; color: var(--gold); }
+    @media (prefers-reduced-motion: reduce) { .barra i { transition: none; } }
+  </style>
+</head>
+<body>
+  <img class="flor tl" src="/media/flor.webp" alt="" aria-hidden="true" />
+  <img class="flor br" src="/media/flor.webp" alt="" aria-hidden="true" />
+  <main>
+    <h1 class="nombres">Benjamín &amp; Talina</h1>
+    <p class="kicker" data-t="titulo">Comparte tus fotos</p>
+    <p class="intro" data-t="intro">Sube aquí las fotos y videos que tomaste en la boda. Llegan directo al álbum de los novios.</p>
+
+    <section class="card" id="card">
+      <label class="campo"><span data-t="tuNombre">Tu nombre (opcional)</span>
+        <input type="text" id="nombre" maxlength="40" autocomplete="name" />
+      </label>
+      <input type="file" id="archivos" accept="image/*,video/*" multiple hidden />
+      <button type="button" class="btn" id="elegir">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <span data-t="elegir">Elegir fotos y videos</span>
+      </button>
+      <p class="nota" data-t="nota">Puedes elegir varias a la vez. Videos de hasta 30 MB.</p>
+
+      <div class="estado" id="estado" hidden>
+        <b id="estado-txt"></b>
+        <div class="barra"><i id="barra"></i></div>
+        <p class="nota" data-t="noCierres">No cierres esta página mientras se suben.</p>
+      </div>
+      <ul class="lista" id="lista"></ul>
+      <button type="button" class="btn sec" id="reintentar" hidden data-t="reintentar">Reintentar las que fallaron</button>
+
+      <div class="gracias" id="gracias" hidden>
+        <div class="ok" aria-hidden="true">✓</div>
+        <strong id="gracias-txt"></strong>
+        <p data-t="graciasSub">¡Gracias por compartir este día con nosotros!</p>
+      </div>
+      <p class="nota" id="sin-config" hidden data-t="pronto">Muy pronto podrás subir tus fotos aquí.</p>
+    </section>
+    <p class="pie">07 · 11 · 2026</p>
+  </main>
+
+  <script>
+  (() => {
+    // Dirección de la aplicación web de Google Apps Script que guarda los archivos en el Drive de los novios
+    const SCRIPT_URL = "";
+    const MAX_VIDEO = 30 * 1024 * 1024, MAX_LADO = 2560, CALIDAD = 0.86, SIMULTANEAS = 2;
+
+    const TXT = {
+      es: {
+        titulo: "Comparte tus fotos", intro: "Sube aquí las fotos y videos que tomaste en la boda. Llegan directo al álbum de los novios.",
+        tuNombre: "Tu nombre (opcional)", elegir: "Elegir fotos y videos", nota: "Puedes elegir varias a la vez. Videos de hasta 30 MB.",
+        noCierres: "No cierres esta página mientras se suben.", reintentar: "Reintentar las que fallaron",
+        graciasSub: "¡Gracias por compartir este día con nosotros!", pronto: "Muy pronto podrás subir tus fotos aquí.",
+        subiendo: (a, t) => `Subiendo ${a} de ${t}`, listas: (n) => (n === 1 ? "Se subió 1 archivo" : `Se subieron ${n} archivos`),
+        fallaron: (n) => (n === 1 ? "1 no se pudo subir" : `${n} no se pudieron subir`), grande: "Muy pesado", error: "Error",
+        pesados: (n) => (n === 1 ? "1 video pesa más de 30 MB" : `${n} videos pesan más de 30 MB`),
+      },
+      en: {
+        titulo: "Share your photos", intro: "Upload the photos and videos you took at the wedding. They go straight to the couple's album.",
+        tuNombre: "Your name (optional)", elegir: "Choose photos and videos", nota: "You can pick several at once. Videos up to 30 MB.",
+        noCierres: "Keep this page open while they upload.", reintentar: "Retry the ones that failed",
+        graciasSub: "Thank you for sharing this day with us!", pronto: "You'll be able to upload your photos here very soon.",
+        subiendo: (a, t) => `Uploading ${a} of ${t}`, listas: (n) => (n === 1 ? "1 file uploaded" : `${n} files uploaded`),
+        fallaron: (n) => (n === 1 ? "1 could not be uploaded" : `${n} could not be uploaded`), grande: "Too large", error: "Error",
+        pesados: (n) => (n === 1 ? "1 video is over 30 MB" : `${n} videos are over 30 MB`),
+      },
+    };
+    const lang = (navigator.language || "es").toLowerCase().startsWith("en") ? "en" : "es";
+    const T = TXT[lang];
+    document.documentElement.lang = lang;
+    if (lang === "en") document.title = "Share your photos · Benjamín & Talina";
+    document.querySelectorAll("[data-t]").forEach((el) => { if (typeof T[el.dataset.t] === "string") el.textContent = T[el.dataset.t]; });
+
+    const $ = (id) => document.getElementById(id);
+    const inputNombre = $("nombre");
+    try { inputNombre.value = localStorage.getItem("fotos-nombre") || ""; } catch {}
+    inputNombre.addEventListener("change", () => { try { localStorage.setItem("fotos-nombre", inputNombre.value.trim()); } catch {} });
+
+    if (!SCRIPT_URL) { $("elegir").disabled = true; $("sin-config").hidden = false; }
+
+    let cola = [], total = 0, hechas = 0, fallidas = 0, pesados = 0, activas = 0;
+
+    $("elegir").addEventListener("click", () => $("archivos").click());
+    $("archivos").addEventListener("change", (e) => {
+      const nuevos = [...e.target.files];
+      e.target.value = "";
+      if (!nuevos.length) return;
+      if (hechas + fallidas + pesados === total) { total = 0; hechas = 0; fallidas = 0; pesados = 0; }
+      $("gracias").hidden = true;
+      for (const f of nuevos) cola.push(agregar(f));
+      total += nuevos.length;
+      pintaEstado();
+      for (let i = 0; i < SIMULTANEAS; i++) siguiente();
+    });
+    $("reintentar").addEventListener("click", () => {
+      const malas = [...document.querySelectorAll(".lista li.error:not(.grande)")].map((li) => li._item);
+      if (!malas.length) return;
+      fallidas -= malas.length;
+      for (const it of malas) { marca(it, ""); cola.push(it); }
+      $("reintentar").hidden = true; $("gracias").hidden = true;
+      pintaEstado();
+      for (let i = 0; i < SIMULTANEAS; i++) siguiente();
+    });
+
+    function agregar(file) {
+      const li = document.createElement("li");
+      const url = URL.createObjectURL(file);
+      if (file.type.startsWith("video/")) {
+        const v = document.createElement("video"); v.src = url + "#t=0.1"; v.muted = true; v.playsInline = true; v.preload = "metadata"; li.appendChild(v);
+      } else {
+        const img = document.createElement("img"); img.src = url; img.alt = ""; img.onerror = () => img.remove(); li.appendChild(img);
+      }
+      const tag = document.createElement("span"); tag.className = "tag"; tag.textContent = "…"; li.appendChild(tag);
+      $("lista").prepend(li);
+      const item = { file, li, tag };
+      li._item = item;
+      return item;
+    }
+    function marca(it, clase, texto) {
+      it.li.className = clase;
+      it.tag.textContent = texto || (clase === "listo" ? "✓" : clase === "subiendo" ? "↑" : "…");
+    }
+    function pintaEstado() {
+      const fin = hechas + fallidas + pesados, enCurso = fin < total;
+      $("estado").hidden = !enCurso;
+      $("estado-txt").textContent = T.subiendo(Math.min(fin + 1, total), total);
+      $("barra").style.width = total ? `${Math.round((fin / total) * 100)}%` : "0";
+      if (!enCurso && total) {
+        $("gracias").hidden = false;
+        $("gracias-txt").textContent = [hechas ? T.listas(hechas) : "", fallidas ? T.fallaron(fallidas) : "", pesados ? T.pesados(pesados) : ""].filter(Boolean).join(" · ");
+        $("reintentar").hidden = fallidas === 0;
+      }
+    }
+
+    async function siguiente() {
+      if (activas >= SIMULTANEAS) return;
+      const it = cola.shift();
+      if (!it) return;
+      activas++;
+      marca(it, "subiendo");
+      try {
+        await subir(it.file);
+        hechas++; marca(it, "listo");
+      } catch (err) {
+        const grande = err && err.message === "grande";
+        if (grande) pesados++; else fallidas++;
+        marca(it, grande ? "error grande" : "error", grande ? "!" : "×");
+        it.li.title = grande ? T.grande : T.error;
+      } finally {
+        activas--;
+        pintaEstado();
+        siguiente();
+      }
+    }
+
+    async function subir(file) {
+      let blob = file, tipo = file.type || "application/octet-stream", ext = (file.name.split(".").pop() || "").toLowerCase();
+      if (tipo.startsWith("image/")) {
+        const c = await comprimir(file).catch(() => null);
+        if (c) { blob = c; tipo = "image/jpeg"; ext = "jpg"; }
+        else if (file.size > MAX_VIDEO) throw new Error("grande");
+      } else if (tipo.startsWith("video/")) {
+        if (file.size > MAX_VIDEO) throw new Error("grande");
+      } else {
+        throw new Error("tipo");
+      }
+      const datos = await aBase64(blob);
+      const nombre = inputNombre.value.trim().slice(0, 40);
+      let ultimo;
+      for (let intento = 0; intento < 3; intento++) {
+        try {
+          const r = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify({ nombre, tipo, ext, datos }),
+          });
+          const j = await r.json();
+          if (j && j.ok) return;
+          ultimo = new Error(j && j.error === "tamano" ? "grande" : "servidor");
+          if (j && (j.error === "tamano" || j.error === "tipo")) break;
+        } catch (e) { ultimo = e; }
+        await new Promise((ok) => setTimeout(ok, 1500 * (intento + 1)));
+      }
+      throw ultimo || new Error("servidor");
+    }
+
+    async function comprimir(file) {
+      const bmp = await createImageBitmap(file, { imageOrientation: "from-image" });
+      const k = Math.min(1, MAX_LADO / Math.max(bmp.width, bmp.height));
+      const w = Math.round(bmp.width * k), h = Math.round(bmp.height * k);
+      const cv = document.createElement("canvas");
+      cv.width = w; cv.height = h;
+      cv.getContext("2d").drawImage(bmp, 0, 0, w, h);
+      bmp.close && bmp.close();
+      const out = await new Promise((ok) => cv.toBlob(ok, "image/jpeg", CALIDAD));
+      if (!out) throw new Error("canvas");
+      return out.size < file.size || file.type !== "image/jpeg" ? out : file;
+    }
+
+    function aBase64(blob) {
+      return new Promise((ok, mal) => {
+        const fr = new FileReader();
+        fr.onload = () => ok(String(fr.result).split(",")[1] || "");
+        fr.onerror = () => mal(fr.error);
+        fr.readAsDataURL(blob);
+      });
+    }
+  })();
+  </script>
+</body>
+</html>
