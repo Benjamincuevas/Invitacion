@@ -1950,7 +1950,7 @@ document.addEventListener("DOMContentLoaded", function () {
       titulo: (a, b) => `Boda de ${a} & ${b}`,
       paseTitulo: "Tu pase de entrada", paseInv: "Personas", paseMesa: "Mesa", paseSilla: "Silla", paseSillas: "Sillas",
       paseNota: "Muéstralo al llegar a la entrada.", paseGuardar: "Guardar mi pase", paseGuardando: "Preparando…",
-      miPase: "Mi pase", porAsignar: "Por asignar", catering: "Catering", pasePersonas: (n) => (n === 1 ? "1 persona" : `${n} personas`),
+      miPase: "Mi pase", porAsignar: "Por asignar", catering: "Catering", novios: "de los novios", pasePersonas: (n) => (n === 1 ? "1 persona" : `${n} personas`),
     },
     en: {
       envHint: "You're invited", envSub: "We're getting married", envCta: "Tap the seal to open", para: "To",
@@ -1979,7 +1979,7 @@ document.addEventListener("DOMContentLoaded", function () {
       titulo: (a, b) => `${a} & ${b}'s Wedding`,
       paseTitulo: "Your entry pass", paseInv: "Guests", paseMesa: "Table", paseSilla: "Seat", paseSillas: "Seats",
       paseNota: "Please show it when you arrive.", paseGuardar: "Save my pass", paseGuardando: "Preparing…",
-      miPase: "My pass", porAsignar: "To be assigned", catering: "Catering", pasePersonas: (n) => (n === 1 ? "1 guest" : `${n} guests`),
+      miPase: "My pass", porAsignar: "To be assigned", catering: "Catering", novios: "of the couple", pasePersonas: (n) => (n === 1 ? "1 guest" : `${n} guests`),
     },
   };
   const enRuta = /^\/en(\/|\.html)?$/.test(location.pathname);
@@ -2531,8 +2531,8 @@ document.addEventListener("DOMContentLoaded", function () {
   $("rd-change").addEventListener("click", () => { $("rsvp-done").hidden = true; $("rsvp-form").hidden = false; $("pase-btn").hidden = true; });
 
   /* --- Pase de entrada con QR (solo para quien confirmó que sí) --- */
-  // Mesa 0 = sillas del catering (personas que van a servir)
-  const txtMesa = (m, tr) => (m === 0 ? tr.catering : m ? String(m) : tr.porAsignar);
+  // Mesa 0 = sillas del catering (personas que van a servir) · Mesa 99 = mesa de los novios
+  const txtMesa = (m, tr) => (m === 0 ? tr.catering : m === 99 ? tr.novios : m ? String(m) : tr.porAsignar);
   const urlPase = (cod) => `${location.origin}/?pase=${encodeURIComponent(cod)}`;
   function qrMatriz(texto) {
     const q = qrcode(0, "M");
@@ -2745,7 +2745,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const chips = [...porMesa.keys()].sort((a, b) => a - b).map((k) => {
         const e = porMesa.get(k);
-        return `<button type="button" data-m="${k}" aria-pressed="${mesaF === k}">${k === 0 ? "Catering" : "Mesa " + k} <b>${e.c}</b>${e.p ? `<small>+${e.p} sin responder</small>` : ""}</button>`;
+        return `<button type="button" data-m="${k}" aria-pressed="${mesaF === k}">${k === 0 ? "Catering" : k === 99 ? "Novios" : "Mesa " + k} <b>${e.c}</b>${e.p ? `<small>+${e.p} sin responder</small>` : ""}</button>`;
       });
       chips.push(`<button type="button" class="sin" data-m="sin" aria-pressed="${mesaF === "sin"}">Confirmados sin mesa <b>${sinMesa}</b></button>`);
       $("pn-mesas").innerHTML = `<p class="pn-add-title">Mesas · personas confirmadas</p><div class="pn-mesa-chips">${chips.join("")}</div>`;
@@ -2779,7 +2779,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const etiqueta = estado === "si" ? `Asistirá${p > 1 ? ` · ${f.confirmadas} de ${p}` : ""}` : estado === "no" ? "No asistirá" : "Sin responder";
         const li = document.createElement("li");
         li.className = "pn-row " + estado;
-        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-seat"><label>Mesa <input type="number" class="pn-mesa" min="0" max="99" inputmode="numeric" aria-label="Mesa (0 = catering)" title="0 = sillas del catering" /></label><label>${p > 1 ? "Sillas" : "Silla"} <input type="text" class="pn-sillas" maxlength="40" placeholder="${p > 1 ? "Ej. 3 y 4" : "Ej. 3"}" aria-label="Silla" /></label><span class="pn-seat-msg" role="status"></span>${estado !== "no" ? `<a class="pn-pase" target="_blank" rel="noopener">Ver código QR</a>` : ""}</div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
+        li.innerHTML = `<span class="pn-n">${idx + 1}</span><div class="pn-who"><b></b>${p > 1 ? `<small>${p} personas</small>` : ""}${f.idioma === "en" ? `<span class="pn-lang" title="Invitación en inglés">EN</span>` : ""}</div><span class="pn-state">${etiqueta}</span><div class="pn-acts"><button type="button" class="pn-copy">Copiar enlace</button><button type="button" class="pn-del pn-idioma">${f.idioma === "en" ? "Pasar a español" : "Pasar a inglés"}</button><button type="button" class="pn-del">Quitar</button></div><div class="pn-seat"><label>Mesa <input type="number" class="pn-mesa" min="0" max="99" inputmode="numeric" aria-label="Mesa (0 = catering, 99 = novios)" title="0 = sillas del catering · 99 = mesa de los novios" /></label><label>${p > 1 ? "Sillas" : "Silla"} <input type="text" class="pn-sillas" maxlength="40" placeholder="${p > 1 ? "Ej. 3 y 4" : "Ej. 3"}" aria-label="Silla" /></label><span class="pn-seat-msg" role="status"></span>${estado !== "no" ? `<a class="pn-pase" target="_blank" rel="noopener">Ver código QR</a>` : ""}</div><div class="pn-confirm" hidden><span>¿Quitar a <b></b> de la lista? Su enlace dejará de funcionar.</span><button type="button" class="pn-yes">Sí, quitar</button><button type="button" class="pn-cancel">Cancelar</button></div>`;
         li.querySelector(".pn-who b").textContent = f.nombre;
         li.querySelector(".pn-confirm b").textContent = f.nombre;
         const inMesa = li.querySelector(".pn-mesa"), inSillas = li.querySelector(".pn-sillas"), seatMsg = li.querySelector(".pn-seat-msg");
@@ -2930,7 +2930,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <h1 class="pv-name"></h1>
         <div class="pv-grid">
           <div><span>Personas</span><b>${estado === "ok" ? conf : n}</b><small>${estado === "ok" ? (conf < n ? `de ${n} en la invitación` : conf === 1 ? "persona" : "personas") : "en la invitación"}</small></div>
-          <div><span>Mesa</span><b class="${g.mesa === 0 ? "largo" : ""}">${g.mesa === 0 ? "Catering" : g.mesa || "—"}</b>${g.mesa != null ? "" : "<small>Sin asignar</small>"}</div>
+          <div><span>Mesa</span><b class="${g.mesa === 0 || g.mesa === 99 ? "largo" : ""}">${g.mesa === 0 ? "Catering" : g.mesa === 99 ? "Novios" : g.mesa || "—"}</b>${g.mesa != null ? "" : "<small>Sin asignar</small>"}</div>
           ${sil ? `<div><span>${(estado === "ok" ? conf : n) > 1 ? "Sillas" : "Silla"}</span><b class="pv-sillas"></b></div>` : ""}
         </div>
         <p class="pv-foot">Código ${paseCod.toUpperCase()} · ${new Date().toLocaleTimeString("es-DO", { hour: "numeric", minute: "2-digit" })}</p>`;
